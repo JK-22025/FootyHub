@@ -9,6 +9,7 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
+    @EnvironmentObject var authManager: AuthManager
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
@@ -83,4 +84,5 @@ private let itemFormatter: DateFormatter = {
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        .environmentObject(AuthManager())
 }

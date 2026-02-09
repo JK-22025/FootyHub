@@ -27,6 +27,7 @@ struct FootyHubApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(AuthManager())
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
