@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Environment(\.managedObjectContext) private var context
+    @EnvironmentObject private var holder: FootyHolder
+    
     @ObservedObject private var auth = AuthService.shared
     @State private var newName = ""
     @State private var errorMessage: String?

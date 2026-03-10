@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct SignupView: View {
+    @Environment(\.managedObjectContext) private var context
+    @EnvironmentObject private var holder: FootyHolder
+    
     @State private var email = ""
     @State private var password = ""
     @State private var displayUserName = ""

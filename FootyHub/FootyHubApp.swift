@@ -18,6 +18,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct FootyHubApp: App {
+    let presistanceController = PersistenceController.shared
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var authManager = AuthService()
@@ -25,10 +26,12 @@ struct FootyHubApp: App {
     let persistenceController = PersistenceController.shared
 
     var body: some Scene {
+        let ctx = presistanceController.container.viewContext
         WindowGroup {
             ContentView()
                 .environmentObject(AuthService())
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(FootyHolder(ctx))
         }
     }
 }

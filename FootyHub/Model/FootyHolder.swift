@@ -28,6 +28,8 @@ class FootyHolder: ObservableObject{
     //MARK: functions
     
     init(_ context: NSManagedObjectContext){
+        seedIFNeeded(context)
+        refreshAll(context)
         
     }
     
@@ -173,6 +175,15 @@ class FootyHolder: ObservableObject{
         refreshMatches(context)
     }
     
+    // search a team or league, player
+    func setSearch(_ text: String, _ context: NSManagedObjectContext){
+        searchText = text
+        refreshTeams(context)
+        refreshPlayers(context)
+        refreshMatches(context)
+    }
+    
+    
     
     
     
@@ -184,13 +195,27 @@ class FootyHolder: ObservableObject{
     
     
     
-    
+    private func seedIFNeeded(_ context: NSManagedObjectContext){
+        let req = Match.fetchRequest()
+        req.fetchLimit = 1
+        let count = (try? context.count(for: req)) ?? 0
+        guard count == 0 else {return}
+        
+        let leagues = Match(context: context)
+        leagues.id = UUID()
+        leagues.stadium = "Stadium"
+        
+        
+    }
     
     
     
     func saveContext(_ context: NSManagedObjectContext){
         do {
             try context.save()
+            
+            //refresh context
+            refreshAll(context)
         } catch {
             // Replace this implementation with code to handle the error appropriately.
             // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
