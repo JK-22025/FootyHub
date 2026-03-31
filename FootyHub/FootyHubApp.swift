@@ -30,7 +30,7 @@ struct FootyHubApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(AuthService())
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, ctx)
                 .environmentObject(FootyHolder(ctx))
         }
     }
