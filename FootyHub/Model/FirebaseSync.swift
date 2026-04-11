@@ -168,8 +168,8 @@ final class FirebaseSync{
         let match = (try? context.fetch(req).first) ?? Match(context: context)
         match.id = uuid
         match.createdAt = data["createdAt"] as? Date
-        match.awayScore = Int16(data["awayScore"] as? Int ?? 0)
-        match.homeScore = Int16(data["homeScore"] as? Int ?? 0)
+        match.awayScore = Int64(data["awayScore"] as? Int ?? 0)
+        match.homeScore = Int64(data["homeScore"] as? Int ?? 0)
         match.stadium = data["stadium"] as? String
         
         if let TS = data["createdAt"] as? Timestamp {

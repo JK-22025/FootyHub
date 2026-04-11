@@ -14,9 +14,9 @@
         <relationship name="teams" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Team" inverseName="league" inverseEntity="Team"/>
     </entity>
     <entity name="Match" representedClassName="Match" syncable="YES" codeGenerationType="class">
-        <attribute name="awayScore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="awayScore" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="homeScore" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="homeScore" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="stadium" optional="YES" attributeType="String"/>
         <relationship name="awayTeam" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Team" inverseName="awayMatches" inverseEntity="Team"/>

@@ -13,9 +13,11 @@ struct MatchListView: View {
     var body: some View {
         NavigationView{
             List{
-                ForEach(holder.matches){ match in
-                    NavigationLink(destination: Text("Match details")) {
-                        //MatchRowItem(match:match)
+                ForEach(holder.matches) { match in
+                    NavigationLink {
+                        Text("Match details")
+                    } label: {
+                        MatchRowItem(match: match)
                     }
                 }
                 .listRowSeparator(.visible)
@@ -33,36 +35,37 @@ struct MatchListView: View {
         }
     }
     
-    struct MachRowItem: View {
+    struct MatchRowItem: View {
         var match: Match
         var body: some View {
-            VStack(alignment: .leading){
-                Text(match.homeTeam?.name ?? "Home Team")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                Text(match.awayTeam?.name ?? "Away Team")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }.padding(8)
-            
-            HStack{
-                Text("\(match.homeScore)")
-                Text("-")
-                Text("\(match.awayScore)")
+            HStack(alignment: .center) {
+                VStack(alignment: .trailing) {
+                    Text(match.homeTeam?.name ?? "Home Team")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    Text(match.awayTeam?.name ?? "Away Team")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                HStack {
+                    Text("\(match.homeScore)")
+                    Text("-")
+                    Text("\(match.awayScore)")
+                }
+                .font(.system(.body, design: .monospaced))
+                .fontWeight(.bold)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.purple.opacity(0.1))
+                .frame(width: 70)
             }
-            .font(.system(.body, design: .monospaced))
-            .fontWeight(.bold)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(Color.purple.opacity(0.1))
-            .frame(width: 70)
-            
+            .padding(8)
         }
     }
-    
-    #Preview {
-        MatchListView()
-    }
+}
+
+#Preview {
+    MatchListView()
 }

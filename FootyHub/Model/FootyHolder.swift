@@ -44,6 +44,8 @@ class FootyHolder: ObservableObject{
     init(_ context: NSManagedObjectContext){
         // 1)coredata changes
         seedIFNeeded(context)
+        seedPlayersIfNeeded(context)
+        seedStadiumsIfNeeded(context)
         refreshAll(context)
         
         //2) firebase listner
@@ -73,6 +75,7 @@ class FootyHolder: ObservableObject{
         refreshPlayers(context)
         refreshLeagues(context)
         refreshTeams(context)
+        refreshStadiums(context)
         refreshSettings(context)
     }
     
@@ -300,7 +303,93 @@ class FootyHolder: ObservableObject{
         try? context.save()
         
         
-    }   
+    }
+
+    private func seedPlayersIfNeeded(_ context: NSManagedObjectContext){
+        let req = Player.fetchRequest()
+        req.fetchLimit = 1
+        let count = (try? context.count(for: req)) ?? 0
+        guard count == 0 else { return }
+
+        func date(_ year: Int, _ month: Int, _ day: Int) -> Date {
+            var comps = DateComponents()
+            comps.year = year
+            comps.month = month
+            comps.day = day
+            return calendar.date(from: comps) ?? Date()
+        }
+
+        let p1 = Player(context: context)
+        p1.name = "Lionel Messi"
+        p1.nationality = "Argentina"
+        p1.brithDate = date(1987, 6, 24)
+
+        let p2 = Player(context: context)
+        p2.name = "Cristiano Ronaldo"
+        p2.nationality = "Portugal"
+        p2.brithDate = date(1985, 2, 5)
+
+        let p3 = Player(context: context)
+        p3.name = "Mohamed Salah"
+        p3.nationality = "Egypt"
+        p3.brithDate = date(1992, 6, 15)
+
+        let p4 = Player(context: context)
+        p4.name = "Kylian Mbappé"
+        p4.nationality = "France"
+        p4.brithDate = date(1998, 12, 20)
+
+        let p5 = Player(context: context)
+        p5.name = "Kevin De Bruyne"
+        p5.nationality = "Belgium"
+        p5.brithDate = date(1991, 6, 28)
+
+        try? context.save()
+    }
+
+    private func seedStadiumsIfNeeded(_ context: NSManagedObjectContext){
+        let req = Stadium.fetchRequest()
+        req.fetchLimit = 1
+        let count = (try? context.count(for: req)) ?? 0
+        guard count == 0 else { return }
+
+        let s1 = Stadium(context: context)
+        s1.name = "Anfield"
+        s1.city = "Liverpool"
+        s1.country = "England"
+        s1.team = "Liverpool FC"
+        s1.imageURL = "soccerball"
+
+        let s2 = Stadium(context: context)
+        s2.name = "Camp Nou"
+        s2.city = "Barcelona"
+        s2.country = "Spain"
+        s2.team = "FC Barcelona"
+        s2.imageURL = "soccerball"
+
+        let s3 = Stadium(context: context)
+        s3.name = "San Siro"
+        s3.city = "Milan"
+        s3.country = "Italy"
+        s3.team = "AC Milan / Inter Milan"
+        s3.imageURL = "soccerball"
+
+        let s4 = Stadium(context: context)
+        s4.name = "Emirates Stadium"
+        s4.city = "London"
+        s4.country = "England"
+        s4.team = "Arsenal FC"
+        s4.imageURL = "soccerball"
+
+        let s5 = Stadium(context: context)
+        s5.name = "Saputo Stadium"
+        s5.city = "Montreal"
+        s5.country = "Canada"
+        s5.team = "CF Montréal"
+        s5.imageURL = "soccerball"
+
+        try? context.save()
+    }
     
     
     
