@@ -16,11 +16,56 @@ final class APISync{
         self.session = session
     }
     
-    // fetch matches, leagues and players and teams und shtaidum
+    // fetch matches for a day
+    func fetchMatchesForDay(
+        date: Date,
+        calendar: Calendar,
+        context: NSManagedObjectContext,
+        onApplyingRemote: @escaping (Bool) -> Void,
+        onRemoteApplied: @escaping () -> Void
+        
+    ){
+        let start = calendar.startOfDay(for: date)
+        let end = calendar.date(byAdding: .day, value: 1, to: start)!
+        
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent("matches"),
+            resolvingAgainstBaseURL: false
+        )!
+        
+        components.queryItems = [
+            URLQueryItem(name: "start", value: Self.backendDateFormatter.string(from: start)),
+            URLQueryItem(name: "end", value: Self.backendDateFormatter.string(from: end))
+            
+        ]
+        
+        guard let url = components.url else{
+            print("Invalid fetch URL")
+            return
+        }
+        
+        print("FETCH URL:", url.absoluteString)
+        
+        DispatchQueue.main.async {
+            onApplyingRemote(true)
+        }
+        
+        let match = session.dataTask(with: url) { data, response, error in
+            if let error{
+                print("GET /matches error:", error)
+                DispatchQueue.main.async {
+                    onApplyingRemote(false)
+                }
+                return
+            }
+            
+            guard(200..<300).contains(httpResponse.statusCode) else {
+                
+            }
+        }
+        
+    }
     
-    // update
-    
-    // delete
     
     // merge remote --> coredata
     
@@ -222,329 +267,6 @@ final class APISync{
         
         
     }
-    
-    
-    
-    
-    // create request
-    // MARK: - Create request builders
-    private func makeCreateRequest(from match: Match) -> CreateMatchRequest? {
-        // All attributes optional; add minimal requirements if your backend needs them.
-        let stadium = match.stadium
-        let createdAt = match.createdAt
-        let homeScore = match.homeScore
-        let awayScore = match.awayScore
-
-        // TODO: Construct and return a CreateMatchRequest using these values once the DTO exists.
-        // Example:
-        // return CreateMatchRequest(
-        //     stadium: stadium,
-        //     createdAt: createdAt.map { Self.backendDateFormatter.string(from: $0) },
-        //     homeScore: homeScore,
-        //     awayScore: awayScore
-        // )
-
-        _ = stadium
-        _ = createdAt
-        _ = homeScore
-        _ = awayScore
-        return nil
-    }
-
-    private func makeCreateRequest(from league: League) -> CreateLeagueRequest? {
-        let name = league.name
-        let country = league.country
-        // Add other optional fields as needed
-
-        // TODO: Construct and return a CreateLeagueRequest once the DTO exists.
-        // Example:
-        // return CreateLeagueRequest(
-        //     name: name,
-        //     country: country
-        // )
-
-        _ = name
-        _ = country
-        return nil
-    }
-
-    private func makeCreateRequest(from team: Team) -> CreateTeamRequest? {
-        let coach = team.coach
-        let desc = team.description
-        let foundedYear = team.foundedYear
-        let leagues = team.leagues
-        let logoUrl = team.logoURL
-        let name = team.name
-        let stadium = team.stadium
-        let stats = team.stats
-
-        // TODO: Construct and return a CreateTeamRequest once the DTO exists.
-        // Example:
-        // return CreateTeamRequest(
-        //     coach: coach,
-        //     description: desc,
-        //     foundedYear: foundedYear,
-        //     leagues: leagues,
-        //     logoUrl: logoUrl,
-        //     name: name,
-        //     stadium: stadium,
-        //     stats: stats
-        // )
-
-        _ = coach
-        _ = desc
-        _ = foundedYear
-        _ = leagues
-        _ = logoUrl
-        _ = name
-        _ = stadium
-        _ = stats
-        return nil
-    }
-
-    private func makeCreateRequest(from player: Player) -> CreatePlayersRequest? {
-        let name = player.name
-        let nationality = player.nationality
-        let position = player.position
-        let team = player.team
-        let birthDate = player.brithDate
-        let photoURL = player.photoURL
-        let height = player.height
-        let weight = player.weight
-        let rating = player.rating
-        let stats = player.stats
-
-        // TODO: Construct and return a CreatePlayerRequest once the DTO exists.
-        // Example:
-        // return CreatePlayerRequest(
-        //     id: id?.uuidString,
-        //     name: name,
-        //     nationality: nationality,
-        //     position: position,
-        //     team: team,
-        //     birthDate: birthDate.map { Self.backendDateFormatter.string(from: $0) },
-        //     height: height,
-        //     weight: weight,
-        //     rating: rating,
-        //     stats: stats,
-        //     photoURL: photoURL
-        // )
-
-        _ = name
-        _ = nationality
-        _ = position
-        _ = team
-        _ = birthDate
-        _ = photoURL
-        _ = height
-        _ = weight
-        _ = rating
-        _ = stats
-        return nil
-    }
-    private func makeCreateRequest(from stadium: Stadium) -> CreateStadiumRequest? {
-        
-        guard
-            let name = stadium.name,
-            let country = stadium.country,
-            let city = stadium.city,
-            let team = stadium.team
-        else {
-            return nil
-        }
-
-        // Other optional attributes
-        let capacity = stadium.capacity
-        let id = stadium.id
-
-        
-        _ = name
-        _ = team
-        _ = capacity
-        _ = id
-        return nil
-        
-    }
-   
-    
-    
-    //update request
-    
-    private func makeUpdateRequest(from match: Match) -> UpdateMatchRequest? {
-        // All attributes are optional in your model. Choose minimal requirements if needed.
-        // Example: require stadium and createdAt if your backend needs them, otherwise remove this guard.
-        // guard let stadium = match.stadium, let createdAt = match.createdAt else { return nil }
-
-        let stadium = match.stadium
-        let createdAt = match.createdAt
-        let homeScore = match.homeScore
-        let awayScore = match.awayScore
-
-        // TODO: Construct and return an UpdateMatchRequest using the values once the DTO exists.
-        // Example:
-        // return UpdateMatchRequest(
-        //     id: match.objectID.uriRepresentation().absoluteString,
-        //     stadium: stadium,
-        //     createdAt: createdAt.map { Self.backendDateFormatter.string(from: $0) },
-        //     homeScore: homeScore,
-        //     awayScore: awayScore
-        // )
-
-        _ = stadium
-        _ = createdAt
-        _ = homeScore
-        _ = awayScore
-        return nil
-    }
-
-    private func makeUpdateRequest(from league: League) -> UpdateLeagueRequest? {
-        // Unwrap only optional fields. Adjust based on your League model.
-        guard
-            let name = league.name,
-            let country = league.country
-        else {
-            return nil
-        }
-
-        // Read non-optional fields directly if any (e.g., identifiers or numeric properties)
-        
-        
-        // TODO: Construct and return an UpdateLeagueRequest using the unwrapped values.
-        // Example:
-        // return UpdateLeagueRequest(
-        //     id: league.objectID.uriRepresentation().absoluteString,
-        //     name: name,
-        //     country: country,
-        //     foundedYear: foundedYear
-        // )
-
-        _ = name
-        _ = country
-        
-        return nil
-    }
-
-    private func makeUpdateRequest(from team: Team) -> UpdateTeamRequest? {
-        // All attributes are optional in your model. Add a minimal guard if your backend requires certain fields.
-        // Example minimal requirements (uncomment if needed):
-        // guard let name = team.name else { return nil }
-
-        let coach = team.coach
-        let desc = team.description
-        let foundedYear = team.foundedYear
-        let leagues = team.leagues
-        let logoUrl = team.logoURL
-        let name = team.name
-        let stadium = team.stadium
-        let stats = team.stats
-
-        // TODO: Construct and return an UpdateTeamRequest using these values once the DTO exists.
-        // Example:
-        // return UpdateTeamRequest(
-        //     id: team.objectID.uriRepresentation().absoluteString,
-        //     coach: coach,
-        //     description: desc,
-        //     foundedYear: foundedYear,
-        //     leagues: leagues,
-        //     logoUrl: logoUrl,
-        //     name: name,
-        //     stadium: stadium,
-        //     stats: stats
-        // )
-
-        _ = coach
-        _ = desc
-        _ = foundedYear
-        _ = leagues
-        _ = logoUrl
-        _ = name
-        _ = stadium
-        _ = stats
-        return nil
-    }
-    
-
-    private func makeUpdateRequest(from player: Player) -> UpdatePlayersRequest? {
-        // All attributes are optional in your model. Choose a minimal set of required fields for an update.
-        // Here we require `name`, `nationality`, `position`, and `team`. Adjust as needed.
-        guard
-            let name = player.name,
-            let nationality = player.nationality,
-            let position = player.position,
-            let team = player.team
-        else {
-            return nil
-        }
-
-        // Other optional attributes
-        let birthDate = player.brithDate
-        let photoURL = player.photoURL
-        let height = player.height
-        let weight = player.weight
-        let rating = player.rating
-        let stats = player.stats
-        let id = player.id
-
-        // TODO: Construct and return an UpdatePlayerRequest using these values once the DTO exists.
-        // Example (define UpdatePlayerRequest to match your backend contract):
-        // return UpdatePlayerRequest(
-        //     id: id?.uuidString,
-        //     name: name,
-        //     nationality: nationality,
-        //     position: position,
-        //     team: team,
-        //     birthDate: birthDate.map { Self.backendDateFormatter.string(from: $0) },
-        //     height: height,
-        //     weight: weight,
-        //     rating: rating,
-        //     stats: stats,
-        //     photoURL: photoURL
-        // )
-
-        // Temporary placeholders so this compiles until UpdatePlayerRequest is defined.
-        _ = name
-        _ = nationality
-        _ = position
-        _ = team
-        _ = birthDate
-        _ = photoURL
-        _ = height
-        _ = weight
-        _ = rating
-        _ = stats
-        _ = id
-        return nil
-    }
-    
-    
-    
-    private func makeUpdateRequest(from stadium: Stadium) -> UpdateStadiumRequest? {
-        
-        guard
-            let name = stadium.name,
-            let country = stadium.country,
-            let city = stadium.city,
-            let team = stadium.team
-        else {
-            return nil
-        }
-
-        // Other optional attributes
-        let capacity = stadium.capacity
-        let id = stadium.id
-
-        
-        _ = name
-        _ = team
-        _ = capacity
-        _ = id
-        return nil
-        
-    }
-    
-    
-    
-   
     
     
     

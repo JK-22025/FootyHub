@@ -210,10 +210,6 @@ final class FirebaseSync{
         db.collection(collectionPath).document(matchID.uuidString).delete()
     }
     
-    func pushDelete(userID: UUID){
-        db.collection(collectionPath).document(userID.uuidString).delete()
-    }
-    
     
     private func serialize(match: Match) -> [String: Any]{
         var out: [String: Any] = [
