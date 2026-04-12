@@ -11,7 +11,7 @@ final class APISync{
     private let baseURL: URL
     private let session: URLSession
     
-    init(baseURL: URL, session: URLSession) {
+    init(baseURL: URL, session: URLSession = .shared) {
         self.baseURL = baseURL
         self.session = session
     }
@@ -50,7 +50,10 @@ final class APISync{
             onApplyingRemote(true)
         }
         
-        let match = session.dataTask(with: url) { data, response, error in
+        let match = session.dataTask(with: url) {
+            data,
+            response,
+            error in
             if let error{
                 print("GET /matches error:", error)
                 DispatchQueue.main.async {
@@ -58,11 +61,95 @@ final class APISync{
                 }
                 return
             }
-            
-            guard(200..<300).contains(httpResponse.statusCode) else {
-                
+            guard let httpResponse = response as? HTTPURLResponse else{
+                print("GET /matches invaild response")
+                DispatchQueue.main.async {
+                    onApplyingRemote(false)
+                }
+                return
             }
+            guard (200..<300).contains(httpResponse.statusCode) else{
+                let bodyString = data.flatMap{String(data: $0, encoding: .utf8) } ?? ""
+                print("GET /matches failed:", httpResponse.statusCode, bodyString)
+                DispatchQueue.main.async {
+                    onApplyingRemote(false)
+                }
+                return
+            }
+            
+            guard let data else{
+                print("GET /matches empty data")
+                DispatchQueue.main.async {
+                    onApplyingRemote(false)
+                }
+                return
+            }
+            
+            do{
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .custom{ decoder in
+                    let container = try decoder.singleValueContainer()
+                    let dateString = try container.decode(String.self)
+                    
+                    if let date = APISync.backendDateFormatter.date(from: dateString){
+                        return date
+                    }
+                    
+                    if let date = APISync.backendDateFormatterWithFractional.date(from: dateString){
+                        return date
+                    }
+                    
+                    if let date = APISync.iso8601WithFractional.date(from: dateString){
+                        return date
+                    }
+                    
+                    if let date = APISync.iso8601Basic.date(from: dateString){
+                        return date
+                    }
+                    
+                    throw DecodingError.dataCorruptedError(
+                        in: container,
+                        debugDescription: "Invalid date format: \(dateString)"
+                    )
+                    
+                        
+                }
+                
+                let remoteMatches = try decoder.decode([MatchDTO].self, from: data)
+                
+                print("REMOTE MATCH COUNT:", remoteMatches.count)
+                for m in remoteMatches{
+                    print("REMOTE:", m.id, m.stadium, m.createdAt as Any)
+                }
+                
+                context.perform {
+                    self.mergeRemoteMatches(remoteMatches, into: context)
+                    
+                    
+                    do{
+                        try context.save()
+                    }catch{
+                        print("CoreData save after fetch failed:", error)
+                    }
+                    
+                    DispatchQueue.main.async {
+                        onApplyingRemote(false)
+                        onRemoteApplied()
+                    }
+                }
+                
+                
+            }catch{
+                print(error.localizedDescription)
+                DispatchQueue.main.async {
+                    onApplyingRemote(false)
+
+                }
+            }
+            
         }
+        
+        match.resume()
         
     }
     
@@ -284,6 +371,17 @@ final class APISync{
            formatter.locale = Locale(identifier: "en_US_POSIX")
            formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSS"
            formatter.timeZone = TimeZone.current
+           return formatter
+       }()
+    private static let iso8601WithFractional: ISO8601DateFormatter = {
+           let formatter = ISO8601DateFormatter()
+           formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+           return formatter
+       }()
+
+       private static let iso8601Basic: ISO8601DateFormatter = {
+           let formatter = ISO8601DateFormatter()
+           formatter.formatOptions = [.withInternetDateTime]
            return formatter
        }()
     

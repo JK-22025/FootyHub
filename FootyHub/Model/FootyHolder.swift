@@ -35,8 +35,11 @@ class FootyHolder: ObservableObject{
     
     private let sync = FirebaseSync(collectionPath: "matches")
     
+    private let APIsync = APISync(baseURL: URL(string: "https://api.football-data.org/v4/matches")!)
+    
+    
     // prevent the echo loop -> remote-> coredata --> saveContext ---> remote
-    private var isApplyingRemoteChanges: Bool = false
+    private var isApplyingRemoteChanges = false
     
     
     //MARK: functions
@@ -47,6 +50,9 @@ class FootyHolder: ObservableObject{
         seedPlayersIfNeeded(context)
         seedStadiumsIfNeeded(context)
         refreshAll(context)
+        
+        // sync the current day
+        
         
         //2) firebase listner
         sync.startListeningForDay(
@@ -436,7 +442,7 @@ class FootyHolder: ObservableObject{
             
             //refresh context
             refreshAll(context)
-            deletedIDs.forEach{sync.pushDelete(userID: $0)}
+            deletedIDs.forEach{sync.pushDelete(matchID: $0)}
             
             guard !isApplyingRemoteChanges else {return}
             
